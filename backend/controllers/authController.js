@@ -46,4 +46,45 @@ const registro = async (req, res) => {
   }
 };
 
-module.exports = { registro };
+// Login de pasajero
+const login = async (req, res) => {
+  try {
+    const { correo, password } = req.body;
+
+    // Buscar pasajero por correo
+    const pasajero = await Pasajero.findOne({ where: { correo } });
+    if (!pasajero) {
+      return res.status(401).json({ mensaje: 'Credenciales incorrectas' });
+    }
+
+    // Verificar contraseña
+    const passwordValido = await bcrypt.compare(password, pasajero.password);
+    if (!passwordValido) {
+      return res.status(401).json({ mensaje: 'Credenciales incorrectas' });
+    }
+
+    // Guardar sesión
+    req.session.usuario = {
+      id: pasajero.id_pasajeros,
+      nombre: pasajero.nombre,
+      correo: pasajero.correo
+    };
+
+    res.json({ mensaje: 'Login exitoso', usuario: req.session.usuario });
+
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error en el servidor', error: error.message });
+  }
+};
+
+// Cerrar sesión
+const logout = (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).json({ mensaje: 'Error al cerrar sesión' });
+    }
+    res.json({ mensaje: 'Sesión cerrada exitosamente' });
+  });
+};
+
+module.exports = { registro, login, logout };
