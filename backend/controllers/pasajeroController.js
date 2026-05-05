@@ -4,7 +4,7 @@ const { Pasajero } = require('../models/index');
 const obtenerPasajeros = async (req, res) => {
   try {
     const pasajeros = await Pasajero.findAll({
-      attributes: { exclude: ['password'] } // nunca enviamos la contraseña
+      attributes: { exclude: ['password'] }
     });
     res.json(pasajeros);
   } catch (error) {
@@ -12,4 +12,19 @@ const obtenerPasajeros = async (req, res) => {
   }
 };
 
-module.exports = { obtenerPasajeros };
+// Obtener un pasajero por ID
+const obtenerPasajeroPorId = async (req, res) => {
+  try {
+    const pasajero = await Pasajero.findByPk(req.params.id, {
+      attributes: { exclude: ['password'] }
+    });
+    if (!pasajero) {
+      return res.status(404).json({ mensaje: 'Pasajero no encontrado' });
+    }
+    res.json(pasajero);
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al obtener pasajero', error: error.message });
+  }
+};
+
+module.exports = { obtenerPasajeros, obtenerPasajeroPorId };
