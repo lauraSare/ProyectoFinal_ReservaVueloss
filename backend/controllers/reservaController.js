@@ -34,4 +34,33 @@ const obtenerReservaPorId = async (req, res) => {
   }
 };
 
-module.exports = { obtenerReservas, obtenerReservaPorId };
+// Crear una reserva
+const crearReserva = async (req, res) => {
+  try {
+    const { id_vuelo, id_pasajero, id_asiento, precio } = req.body;
+
+    // Crear la reserva
+    const nuevaReserva = await Reserva.create({
+      fecha_reserva: new Date(),
+      estado: "en espera",
+      id_vuelo,
+      id_pasajero,
+    });
+
+    // Asignar asiento a la reserva
+    await ReservaAsiento.create({
+      precio,
+      id_reserva: nuevaReserva.id_reserva,
+      id_asiento,
+    });
+
+    res
+      .status(201)
+      .json({ mensaje: "Reserva creada exitosamente", reserva: nuevaReserva });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ mensaje: "Error al crear reserva", error: error.message });
+  }
+};
+module.exports = { obtenerReservas, obtenerReservaPorId, crearReserva };
