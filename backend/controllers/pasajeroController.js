@@ -27,4 +27,20 @@ const obtenerPasajeroPorId = async (req, res) => {
   }
 };
 
-module.exports = { obtenerPasajeros, obtenerPasajeroPorId };
+// Actualizar un pasajero
+const actualizarPasajero = async (req, res) => {
+  try {
+    const pasajero = await Pasajero.findByPk(req.params.id);
+    if (!pasajero) {
+      return res.status(404).json({ mensaje: 'Pasajero no encontrado' });
+    }
+
+    await pasajero.update(req.body);
+    res.json({ mensaje: 'Pasajero actualizado exitosamente', pasajero });
+
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al actualizar pasajero', error: error.message });
+  }
+};
+
+module.exports = { obtenerPasajeros, obtenerPasajeroPorId, actualizarPasajero };
