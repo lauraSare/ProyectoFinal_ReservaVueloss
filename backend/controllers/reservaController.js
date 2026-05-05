@@ -63,4 +63,19 @@ const crearReserva = async (req, res) => {
       .json({ mensaje: "Error al crear reserva", error: error.message });
   }
 };
-module.exports = { obtenerReservas, obtenerReservaPorId, crearReserva };
+// Actualizar una reserva
+const actualizarReserva = async (req, res) => {
+  try {
+    const reserva = await Reserva.findByPk(req.params.id);
+    if (!reserva) {
+      return res.status(404).json({ mensaje: 'Reserva no encontrada' });
+    }
+
+    await reserva.update(req.body);
+    res.json({ mensaje: 'Reserva actualizada exitosamente', reserva });
+
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al actualizar reserva', error: error.message });
+  }
+};
+module.exports = { obtenerReservas, obtenerReservaPorId, crearReserva, actualizarReserva };
