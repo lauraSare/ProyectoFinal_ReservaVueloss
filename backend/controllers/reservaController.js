@@ -78,4 +78,24 @@ const actualizarReserva = async (req, res) => {
     res.status(500).json({ mensaje: 'Error al actualizar reserva', error: error.message });
   }
 };
-module.exports = { obtenerReservas, obtenerReservaPorId, crearReserva, actualizarReserva };
+
+// Eliminar una reserva
+const eliminarReserva = async (req, res) => {
+  try {
+    const reserva = await Reserva.findByPk(req.params.id);
+    if (!reserva) {
+      return res.status(404).json({ mensaje: 'Reserva no encontrada' });
+    }
+
+    // Eliminar primero los asientos de la reserva
+    await ReservaAsiento.destroy({ where: { id_reserva: req.params.id } });
+
+    // Luego eliminar la reserva
+    await reserva.destroy();
+    res.json({ mensaje: 'Reserva eliminada exitosamente' });
+
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al eliminar reserva', error: error.message });
+  }
+};
+module.exports = { obtenerReservas, obtenerReservaPorId, crearReserva, actualizarReserva, eliminarReserva };
